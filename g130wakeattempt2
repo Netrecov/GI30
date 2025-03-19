@@ -1,0 +1,72 @@
+after attempt 1 failed, i thought more on it, and attempted to use a pi zero w, hosting a website, that would allow the user to press a button, then executing a python script, that could press the button, 
+by shorting out the connections on the pcb, that are shorted when the button is pressed.
+
+I havent lcoated a service manual or any techincal documents or schematics for the GI30.
+I attempt to take off the front panel but after removing the screws, it was still held on, maybe with double sided tape. i stopped before i damamged the surface.
+
+I moved onto the back panel, and after removing the screws, i see that i could access the internal electrics.
+i had to disconnect the connector to the power supply, and where it loops back up to connect to the back pcb.
+I also had to disconnect a smaller connector, maybe only 4-5 wires.
+the antenna was permenant attached, and prevents full dissasembly.
+
+Using my multimeter, while the unit was not connected to power, i tested the solder points on the back of the pcb, in the area of where the rotary button is located, and found 2 points that the circuit was closed when the button was pressed.
+I soldered on a pair of wires, and ran them into the plastic shroud.
+I then put the connectors back on, and secured the panel back in place.
+I then remmoved the screws from the plastioc shroud, and removed that being careful as movement is limited by the length of wires running to the inner pcb.
+
+I then routed the wire pair out the top side, and then secured the plastic panel back in place, i did not fully tighted the screws where the wires come out to prevent damage to the wires.
+
+I then connected the wires to gpio 13 (pin 33) (thought it was gpio 23), and gnd of the pi zero, i worked through several iterations of python code, but failed to be able to close the circuit.
+
+I attempted to use a npn transitor, and no luck.
+I then removed the wired from the pi, and tried to use a relay.
+nothing was working, (due to using an incorrect gpio pin out).
+I was watching the connections on the relay with my multimeter in continuity mode, and i noticed when i flipped the leads, the unit would power on, and come out of standby, if i flipped them again, the unit would power off (weird).
+
+"ok so i have the com connected to 5v, and NO on the relay connected to led, other leg of led 100ohm resistor then gnd
+the relay does nothing when setting to high, then low
+but if i take a wire from the NC side of the relay to the first leg of the led instead of the NO side, the led turns on"
+
+i finally took it all apart, and used a breadboard with a led as the target of the relay, and through debugging found it to be incorrect knowledge of the gpio pin layout.
+once this was corrected i was able to get the led to power on.
+
+now it was time to move back to the speaker.
+I waited for the unit to go into standby, and wanted to validate i hadnt broken anything, but connecting the wires again, and validating the unit would come out of sleep.
+Nothing occured.
+I orginally observed 3.3 volts between the wire pair, now its 2.4 volts. The button on the back has no effect when pressed.
+the rest of the unit is still functional
+
+Wiring:
+Relay VCC → 5V (Pin 2 on the Raspberry Pi)
+Relay GND → GND (Pin 6 on the Raspberry Pi)
+Relay IN (Control Pin) → GPIO 13 (Pin 33 on the Raspberry Pi)
+
+Relay Com → one of the wires in the pair
+Relay NC → other one of the wires in the pair
+
+
+script that works:
+import subprocess
+import time
+
+# Function to close the relay (set GPIO to HIGH)
+def close_relay():
+    print("Closing relay...")
+    subprocess.run(["sudo", "raspi-gpio", "set", "13", "dh"])  # Set GPIO 23 to HIGH (driving high)
+
+# Function to open the relay (set GPIO to LOW)
+def open_relay():
+    print("Opening relay...")
+    subprocess.run(["sudo", "raspi-gpio", "set", "13", "dl"])  # Set GPIO 23 to LOW (driving low)
+
+# Example usage: Close and then open the relay
+try:
+    close_relay()  # Close the relay
+    time.sleep(5)  # Wait for 5 seconds
+    open_relay()   # Open the relay
+
+finally:
+    print("Relay control complete.")
+
+
+
