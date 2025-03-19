@@ -3,9 +3,68 @@ items used
 lepotato
 sg90 servo
 
+Requirements
+LePotato board
+SG90 servo
+Jumper wires
+External power supply (optional, for high-current servos)
+Breadboard (optional, for easier connections)
+
+Steps to Control the SG90 Servo
+Connect the Servo to the LePotato:
+The SG90 servo has three wires:
+Brown/Black wire: Ground (GND) → Connect to a GND pin on the LePotato.
+Red wire: Power (VCC) → Connect to a 5V pin on the LePotato.
+Yellow/Orange wire: Signal → Connect to a GPIO pin on the LePotato (e.g., GPIO18).
+Note: If your servo requires more current than the LePotato can provide, use an external 5V power supply for the servo and connect the grounds together.
+
+Install Required Software:
+The LePotato runs Linux, so you can use Python to control the GPIO pins.
+Install the libgpiod library or RPi.GPIO-compatible libraries for GPIO control:
+
+bash
+sudo apt update
+sudo apt install python3-gpiozero
+
+Install libgpiod and its Python bindings:
+bash
+sudo apt install python3-libgpiod
 
 
+Write a Python Script to Control the Servo:
+final script is servomanual.py
+
+
+
+Which Pin Should You Use?
+For controlling an SG90 servo, you need a PWM-capable GPIO pin. From the table:
+GPIOAO_6 supports PWM_AO_B and PWM_F, making it a good candidate for PWM control.
+GPIOX_12 and GPIOX_13 are not explicitly marked as PWM-capable, so they are less suitable.
+
+Wiring
+Servo VCC (Red wire): Connect to 5V (Pin 2 or 4).
+Servo GND (Brown/Black wire): Connect to GND (Pin 6 or 9).
+Servo Signal (Yellow/Orange wire): Connect to GPIOAO_6 (Physical Pin 12).
 
 
 
 final script is servomanual.py
+How It Works
+Start at 0 Degrees:
+The script sets the servo to 0 degrees by sending a pulse width of 500 µs (0.0005 s).
+Rotate to 45 Degrees:
+The script sets the servo to 45 degrees by sending a pulse width of 1050 µs (0.00105 s).
+Wait:
+The script waits for 1 second at each position to allow the servo to settle.
+Exit:
+The script releases the GPIO line and exits.
+
+
+Run the script with sudo python3 servomanual.py
+
+
+
+
+
+Final result:
+Not enough mechanical leverage to press the front rotary button down. Armature would twist, even when using 1/2 inch wood
