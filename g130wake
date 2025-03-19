@@ -1,0 +1,11 @@
+first attempt was a lepotato, using the ir reciever, that when a remote button was pressed, it would, via the gopi pins, control a servo, that would turn 45 degrees, with an armature, thus pushing the button.
+items used
+lepotato
+sg90 servo
+
+
+
+
+
+
+final script is servomanual.py
