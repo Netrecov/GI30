@@ -1,0 +1,69 @@
+#include <WiFi.h>
+
+const char* ssid = "SSID";
+const char* password = "SSIDPW";
+const char* hostname = "esp32-relay";  // Set your desired hostname
+
+WiFiServer server(80);
+#define RELAY_PIN 13
+bool relayState = false;
+
+void setup() {
+    Serial.begin(115200);
+    pinMode(RELAY_PIN, OUTPUT);
+    digitalWrite(RELAY_PIN, LOW);  // Start with relay OFF
+
+    WiFi.begin(ssid, password);
+    Serial.print("Connecting to WiFi...");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("\nConnected to WiFi!");
+    Serial.println(WiFi.localIP());  // Print ESP32 IP Address
+
+    server.begin();
+}
+
+void loop() {
+    WiFiClient client = server.available();  // Check for incoming client
+
+    if (client) {
+        String request = client.readStringUntil('\r');
+        client.flush();
+
+        if (request.indexOf("/toggle") != -1) {
+            // Toggle relay for 1 second
+            digitalWrite(RELAY_PIN, HIGH);  // Turn ON
+            delay(1000);  // Wait for 1 second
+            digitalWrite(RELAY_PIN, LOW);   // Turn OFF
+        }
+
+        // Send webpage
+        client.println("HTTP/1.1 200 OK");
+        client.println("Content-Type: text/html");
+        client.println("Connection: close");
+        client.println();
+        client.println("<!DOCTYPE html>");
+        client.println("<html><head><title>Monster GI30 Standby</title>");
+        client.println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
+        client.println("<style>");
+        client.println("body { background-color: #121212; color: #ffffff; font-family: Arial, sans-serif; text-align: center; }");
+        client.println("h2 { color: #BB86FC; }");
+        client.println("button { background-color: #BB86FC; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 20px; }");
+        client.println("button:hover { background-color: #3700B3; }");
+        client.println(".status { font-size: 20px; margin-top: 20px; }");
+        client.println("</style></head>");
+        client.println("<body>");
+        client.println("<h2>Monster GI30 Standby</h2>");
+        client.print("<p class='status'>Relay is: <b>");
+        client.print(relayState ? "ON" : "OFF");
+        client.println("</b></p>");
+        client.println("<button onclick='toggleRelay()'>Toggle Relay</button>");
+        client.println("<script>");
+        client.println("function toggleRelay() { fetch('/toggle'); setTimeout(() => location.reload(), 500); }");
+        client.println("</script>");
+        client.println("</body></html>");
+        client.stop();
+    }
+}
