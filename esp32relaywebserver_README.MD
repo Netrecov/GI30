@@ -3,6 +3,8 @@ Finally got this working......
 Working to clean it up.
 here is images of the pcb in the back.
 i marked where the twisted wire pair was soldered previously.
+![alt text](https://github.com/Netrecov/GI30/blob/main/pcb_back.jpg?raw=true)
+![alt text](https://github.com/Netrecov/GI30/blob/main/pcb_front.jpg?raw=true)
 pcb_back.jpg
 pcb_front.jpg
 
@@ -14,4 +16,5 @@ I decided on the button with the number 1 on it, as its only used to set a prese
 i soldered back on the twister pair to pins 2 and pin 3 of the tactile switch, and then put the unit back together.
 I drilled a small hole on the plastic housing for the antenna for the wires to come out of the unit.
 I used an esp32 to make a script that i can now remotely press the button, thus taking the unit out of standby, with all my settings saved.
+![alt text](https://github.com/Netrecov/GI30/blob/main/esp32relay.jpg?raw=true)
 esp32relay.jpg
